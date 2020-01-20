@@ -12,7 +12,7 @@
     state: "directory"
     owner: "root"
     group: "root"
-    mode: "0755"
+    mode: "0700"
 
 - name: Generate iptables config
   template:
@@ -20,7 +20,7 @@
     dest: "/var/lib/iptables/rules-save"
     owner: "root"
     group: "root"
-    mode: "0644"
+    mode: "0600"
   register: iptables_register_config
 
 - name: Copy systemd unit file
@@ -36,7 +36,7 @@
   command: "systemctl daemon-reload"
   when: iptables_register_unit | changed
 
-- name: Restart iptables service
+- name: Restart iptables service (NOTE this can disrupt the active SSH connection, restart playbook...)
   service:
     name: "iptables-restore"
     state: "restarted"
