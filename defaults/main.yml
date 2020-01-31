@@ -14,9 +14,6 @@ iptables_config_v4: |
   :OUTPUT ACCEPT [0:0]
   :INPUT_LOG_DROP - [0:0]
 
-  # --- Flush all the rules
-  -F
-
   # --- Create a chain to log and drop incoming traffic
   -A INPUT_LOG_DROP -j LOG --log-prefix "INPUT:DROP: " --log-level 6
   -A INPUT_LOG_DROP -j DROP
@@ -47,7 +44,5 @@ iptables_config_v6: |
   :INPUT DROP [0:0]
   :FORWARD DROP [0:0]
   :OUTPUT DROP [0:0]
-
-  -F
 
   COMMIT
