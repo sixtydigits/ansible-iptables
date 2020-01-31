@@ -38,14 +38,17 @@ iptables_config_v4: |
   COMMIT
 
 # The default IPV6 set up will lock down your server, and then open up:
-# port 22 (SSH) and allow pings from the outside world.
+# port 22 (SSH) and allow pings from the outside world. It will also drop 
+# any outbound IPV6 traffic.
+# NOTE: If you've disabled IPV6 you can set this variable false to avoid
+# creating the IPV6 rules file.
 iptables_config_v6: |
   *filter
 
   # --- Disallow everything as the default filter policy.
   :INPUT DROP [0:0]
   :FORWARD DROP [0:0]
-  :OUTPUT ACCEPT [0:0]
+  :OUTPUT DROP [0:0]
   :INPUT_LOG_DROP - [0:0]
 
   # --- Flush all the rules
