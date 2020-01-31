@@ -1,9 +1,13 @@
 - name: Apply IPV4 rules
   shell: iptables-restore < /etc/iptables/rules.v4
+  async: 10
+  poll: 0
   become: yes
 
 - name: Apply IPV6 rules
   shell: ip6tables-restore < /etc/iptables/rules.v6
+  async: 10
+  poll: 0
   become: yes
 
 - name: (CLEANUP) Reload systemd daemon to remove iptables-restore.service
