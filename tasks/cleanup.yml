@@ -1,0 +1,24 @@
+---
+- name: (CLEANUP) Remove the unused /var/lib/iptables directory
+  file:
+    path: /var/lib/iptables
+    state: absent
+
+- name: (CLEANUP) Disable the iptables-restore service
+  systemd:
+    name: iptables-restore
+    state: stopped
+    enabled: no
+    daemon_reload: yes
+  ignore_errors: yes # the service could have been removed by the following tasks
+
+- name: (CLEANUP) Remove the unused /etc/systemd/system/iptables-restore.service file
+  file:
+    path: /etc/systemd/system/iptables-restore.service
+    state: absent
+  notify: Reload systemd daemon to remove iptables-restore.service
+
+- name: (CLEANUP) Force systemd to reread configs
+  systemd:
+    daemon_reload: yes
+  when: cleanup_iptables_restore_systemd_result.changed

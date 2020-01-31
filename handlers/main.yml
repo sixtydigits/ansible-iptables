@@ -1,0 +1,12 @@
+- name: Apply IPV4 rules
+  command: iptables-restore < /etc/iptables/rules.v4
+  become: yes
+
+- name: Apply IPV6 rules
+  command: iptables-restore < /etc/iptables/rules.v6
+  become: yes
+
+- name: Reload systemd daemon to remove iptables-restore.service
+  systemd:
+    daemon_reload: yes
+  become: yes

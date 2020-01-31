@@ -1,50 +1,39 @@
 ---
+- name: Cleanup the previous iptables-restore systemd method
+  import_tasks: cleanup.yml
+  when: cleanup_iptables_restore_systemd
 
-- name: Install iptables
+- name: Install iptables-persistent which ensures rules are applied at an appropriate stage during boot
   apt:
-    name: "iptables"
-    state: "present"
-    install_recommends: False
+    name: iptables-persistent
+    state: present
 
-- name: Create /var/lib/iptables directory
+- name: Create /etc/iptables directory
   file:
-    path: "/var/lib/iptables"
-    state: "directory"
-    owner: "root"
-    group: "root"
-    mode: "0700"
+    path: /etc/iptables
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
 
-- name: Generate iptables config
+- name: Update the /etc/iptables/rules.v4 file
   template:
-    src: "var/lib/iptables/rules-save.j2"
-    dest: "/var/lib/iptables/rules-save"
-    owner: "root"
-    group: "root"
-    mode: "0600"
-  register: iptables_register_config
+    src: rules.v4.j2
+    dest: /etc/iptables/rules.v4
+    owner: root
+    group: root
+    mode: 0600
+  register: iptables_config_v4_result
+  notify:
+    - Apply IPV4 rules
 
-- name: Copy systemd unit file
-  copy:
-    src: "etc/systemd/system/iptables-restore.service"
-    dest: "/etc/systemd/system/iptables-restore.service"
-    owner: "root"
-    group: "root"
-    mode: "0644"
-  register: iptables_register_unit
-
-- name: Reload systemd daemon
-  command: "systemctl daemon-reload"
-  when: iptables_register_unit | changed
-
-- name: Restart iptables service (NOTE this can disrupt the active SSH connection, restart playbook...)
-  service:
-    name: "iptables-restore"
-    state: "restarted"
-    enabled: True
-  when: iptables_register_config | changed
-
-- name: Restart dependent services
-  shell: test -f {{ item.path }}/{{ item.name }}.service \
-         && systemctl restart {{ item.name }}.service || true
-  with_items: "{{ iptables_restart_dependent_services }}"
-  when: iptables_restart_dependent_services and iptables_register_config | changed
+- name: Update the /etc/iptables/rules.v6 file
+  template:
+    src: rules.v6.j2
+    dest: /etc/iptables/rules.v6
+    owner: root
+    group: root
+    mode: 0600
+  register: iptables_config_v6_result
+  notify:
+    - Apply IPV6 rules
