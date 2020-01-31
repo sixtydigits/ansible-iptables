@@ -37,9 +37,7 @@ iptables_config_v4: |
 
   COMMIT
 
-# The default IPV6 set up will lock down your server, and then open up:
-# port 22 (SSH) and allow pings from the outside world. It will also drop 
-# any outbound IPV6 traffic.
+# The default IPV6 rules do not allow IPV6 traffic in or out.
 # NOTE: If you've disabled IPV6 you can set this variable false to avoid
 # creating the IPV6 rules file.
 iptables_config_v6: |
@@ -49,40 +47,7 @@ iptables_config_v6: |
   :INPUT DROP [0:0]
   :FORWARD DROP [0:0]
   :OUTPUT DROP [0:0]
-  :INPUT_LOG_DROP - [0:0]
 
-  # --- Flush all the rules
   -F
 
-  # --- Create a chain to log and drop incoming traffic
-  -A INPUT_LOG_DROP -j LOG --log-prefix "INPUT:DROP: " --log-level 6
-  -A INPUT_LOG_DROP -j DROP
-
-  # --- Allow unrestricted traffic on a few local network adapters.
-  -A INPUT -i lo -j ACCEPT
-  -A INPUT -i eth1 -j ACCEPT
-  -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-
-  # --- Allow the outside world to connect to SSH (22).
-  -A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
-
-  # --- Allow the outside world to send all ICMP requests (ping, etc.).
-  -A INPUT -p ipv6-icmp -j ACCEPT
-
-  # INPUT default DROP
-  -A INPUT -j INPUT_LOG_DROP
-
   COMMIT
-
-# A list of 0 or more services to get restart after your iptables rules are
-# changed. For instance, Docker makes a number of iptables changes and must be
-# loaded after iptables.
-#
-# All of this is taken care of by this role and my Docker role, and in the case
-# where the service (Docker in this case) isn't installed, this task will skip.
-#
-# Keep in mind, if this does get ran then your service will restart. In the
-# case of Docker, all of your containers will restart too, but that's what
-# you need to do if you change iptables around. Try not to do it ever / often!
-iptables_restart_dependent_services:
-  - "docker"
