@@ -6,7 +6,7 @@
   command: ip6tables-restore < /etc/iptables/rules.v6
   become: yes
 
-- name: Reload systemd daemon to remove iptables-restore.service
+- name: (CLEANUP) Reload systemd daemon to remove iptables-restore.service
   systemd:
     daemon_reload: yes
   become: yes

@@ -16,9 +16,4 @@
   file:
     path: /etc/systemd/system/iptables-restore.service
     state: absent
-  notify: Reload systemd daemon to remove iptables-restore.service
-
-- name: (CLEANUP) Force systemd to reread configs
-  systemd:
-    daemon_reload: yes
-  when: cleanup_iptables_restore_systemd_result.changed
+  notify: (CLEANUP) Reload systemd daemon to remove iptables-restore.service
