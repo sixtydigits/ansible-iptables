@@ -8,6 +8,12 @@
     name: iptables-persistent
     state: present
 
+- name: Ensure that netfilter-persistent will be enabled at boot
+  systemd:
+    name: netfilter-persistent
+    state: started
+    enabled: yes
+
 - name: Create /etc/iptables directory
   file:
     path: /etc/iptables
@@ -34,6 +40,7 @@
     owner: root
     group: root
     mode: 0600
+  when: iptables_config_v6 is defined and iptables_config_v6
   register: iptables_config_v6_result
   notify:
     - Apply IPV6 rules
