@@ -45,6 +45,6 @@
   notify:
     - Apply IPV6 rules
 
-- name: Apply the the uploaded rules early
-  meta: flush
+- name: Apply the the updateded rules early
+  meta: flush_handlers
   when: iptables_flush_to_apply_rules
