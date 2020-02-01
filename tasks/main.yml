@@ -44,3 +44,7 @@
   register: iptables_config_v6_result
   notify:
     - Apply IPV6 rules
+
+- name: Apply the the uploaded rules early
+  meta: flush
+  when: iptables_flush_to_apply_rules
